@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import math
 # =============================================================================
 # Read and separate date just for "LargeSmall" experiment
 data = pd.read_excel('Responses.xlsx')
@@ -122,11 +123,148 @@ DC_main = np.delete(DC_main, OutlierIndices, axis = 0)
 # =============================================================================
 # We have two main factors: total number of agents (group size) that can be 12 
 # or 60, and number of responding agents that can be 1, 4, or 7 for the group size
-# 12, and 5, 20, or 35 for the group size 60
+# 12, and 5, 20, or 35 for the group size 60. The ratio of responding agents to 
+# the whole number of agents is 1/12, 4/12, or 7/12
+# first, separate large (60) and small groups (12), then number of responding agents
+NRA_60 = np.reshape(np.where([TNA_main == 60],NRA_main,np.nan),[np.size(NRA_main,0),np.size(NRA_main,1)])
+RLH_60 = np.reshape(np.where([TNA_main == 60],RLH_main,np.nan),[np.size(RLH_main,0),np.size(RLH_main,1)])
+Response_60 = np.reshape(np.where([TNA_main == 60],Response_main,np.nan),[np.size(Response_main,0),np.size(Response_main,1)])
+RT_60 = np.reshape(np.where([TNA_main == 60],RT_main,np.nan),[np.size(RT_main,0),np.size(RT_main,1)])
+DC_60 = np.reshape(np.where([TNA_main == 60],DC_main,np.nan),[np.size(DC_main,0),np.size(DC_main,1)])
 
+NRA_12 = np.reshape(np.where([TNA_main == 12],NRA_main,np.nan),[np.size(NRA_main,0),np.size(NRA_main,1)])
+RLH_12 = np.reshape(np.where([TNA_main == 12],RLH_main,np.nan),[np.size(RLH_main,0),np.size(RLH_main,1)])
+Response_12 = np.reshape(np.where([TNA_main == 12],Response_main,np.nan),[np.size(Response_main,0),np.size(Response_main,1)])
+RT_12 = np.reshape(np.where([TNA_main == 12],RT_main,np.nan),[np.size(RT_main,0),np.size(RT_main,1)])
+DC_12 = np.reshape(np.where([TNA_main == 12],DC_main,np.nan),[np.size(DC_main,0),np.size(DC_main,1)])
+# =============================================================================
+RLH_60_1 = np.reshape(np.where([NRA_60 == 5], RLH_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+Response_60_1 = np.reshape(np.where([NRA_60 == 5], Response_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+RT_60_1 = np.reshape(np.where([NRA_60 == 5], RT_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+DC_60_1 = np.reshape(np.where([NRA_60 == 5], DC_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
 
+RLH_60_4 = np.reshape(np.where([NRA_60 == 20], RLH_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+Response_60_4 = np.reshape(np.where([NRA_60 == 20], Response_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+RT_60_4 = np.reshape(np.where([NRA_60 == 20], RT_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+DC_60_4 = np.reshape(np.where([NRA_60 == 20], DC_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
 
-Follow = abs(Response_main - RLH_main) == 1
-all_main = np.sum(~np.isnan(RLH_main), axis = 1)
-Follow_main = np.sum(Follow)
-Follow_main/all_main
+RLH_60_7 = np.reshape(np.where([NRA_60 == 35], RLH_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+Response_60_7 = np.reshape(np.where([NRA_60 == 35], Response_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+RT_60_7 = np.reshape(np.where([NRA_60 == 35], RT_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+DC_60_7 = np.reshape(np.where([NRA_60 == 35], DC_60,np.nan),[np.size(NRA_60,0),np.size(NRA_60,1)])
+# =============================================================================
+RLH_12_1 = np.reshape(np.where([NRA_12 == 1], RLH_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+Response_12_1 = np.reshape(np.where([NRA_12 == 1], Response_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+RT_12_1 = np.reshape(np.where([NRA_12 == 1], RT_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+DC_12_1 = np.reshape(np.where([NRA_12 == 1], DC_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+
+RLH_12_4 = np.reshape(np.where([NRA_12 == 4], RLH_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+Response_12_4 = np.reshape(np.where([NRA_12 == 4], Response_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+RT_12_4 = np.reshape(np.where([NRA_12 == 4], RT_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+DC_12_4 = np.reshape(np.where([NRA_12 == 4], DC_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+
+RLH_12_7 = np.reshape(np.where([NRA_12 == 7], RLH_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+Response_12_7 = np.reshape(np.where([NRA_12 == 7], Response_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+RT_12_7 = np.reshape(np.where([NRA_12 == 7], RT_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+DC_12_7 = np.reshape(np.where([NRA_12 == 7], DC_12,np.nan),[np.size(NRA_12,0),np.size(NRA_12,1)])
+
+# =============================================================================
+# analyzing percentage of follow ==============================================
+# =============================================================================
+Follow_60_1 = abs(Response_60_1 - RLH_60_1) == 1
+all_60_1 = np.sum(~np.isnan(RLH_60_1), axis = 1)
+Follow_60_1_sum = np.sum(Follow_60_1)
+Following_60_1 = Follow_60_1_sum/all_60_1
+
+Follow_60_4 = abs(Response_60_4 - RLH_60_4) == 1
+all_60_4 = np.sum(~np.isnan(RLH_60_4), axis = 1)
+Follow_60_4_sum = np.sum(Follow_60_4)
+Following_60_4 = Follow_60_4_sum/all_60_4
+
+Follow_60_7 = abs(Response_60_7 - RLH_60_7) == 1
+all_60_7 = np.sum(~np.isnan(RLH_60_7), axis = 1)
+Follow_60_7_sum = np.sum(Follow_60_7)
+Following_60_7 = Follow_60_7_sum/all_60_7
+
+Follow_12_1 = abs(Response_12_1 - RLH_12_1) == 1
+all_12_1 = np.sum(~np.isnan(RLH_12_1), axis = 1)
+Follow_12_1_sum = np.sum(Follow_12_1)
+Following_12_1 = Follow_12_1_sum/all_12_1
+
+Follow_12_4 = abs(Response_12_4 - RLH_12_4) == 1
+all_12_4 = np.sum(~np.isnan(RLH_12_4), axis = 1)
+Follow_12_4_sum = np.sum(Follow_12_4)
+Following_12_4 = Follow_12_4_sum/all_12_4
+
+Follow_12_7 = abs(Response_12_7 - RLH_12_7) == 1
+all_12_7 = np.sum(~np.isnan(RLH_12_7), axis = 1)
+Follow_12_7_sum = np.sum(Follow_12_7)
+Following_12_7 = Follow_12_7_sum/all_12_7
+
+Follow_12 = np.empty((8,3))
+Follow_12[:,0] = Following_12_1
+Follow_12[:,1] = Following_12_4
+Follow_12[:,2] = Following_12_7
+
+Follow_60 = np.empty((8,3))
+Follow_60[:,0] = Following_60_1
+Follow_60[:,1] = Following_60_4
+Follow_60[:,2] = Following_60_7
+
+mean_Follow_12 = np.mean(Follow_12,axis=0)
+mean_Follow_60 = np.mean(Follow_60,axis=0)
+
+CI_Follow_12 = 1.96*np.std(Follow_12,axis=0)/math.sqrt(8)       # 95% confidence interval
+CI_Follow_60 = 1.96*np.std(Follow_60,axis=0)/math.sqrt(8) 
+
+plt.xlim(0.5,3.5)
+plt.ylim(3.5,7)
+plt.xlabel('ratio of responding agents to the present agents')
+plt.ylabel('follow percentage')
+plt.xticks([1,2,3],['1/12','4/12','7/12'])
+# plt.bar(np.arange(1,4),mean_Follow_12)
+
+# plt.bar(np.arange(1,4),mean_Follow_60)
+plt.plot(np.arange(1,4),mean_Follow_12,'-o', color='#005249')
+plt.plot(np.arange(1,4),mean_Follow_60,'-o', color='#fb7d07')
+plt.errorbar(np.arange(1,4),mean_Follow_12,CI_Follow_12)
+plt.errorbar(np.arange(1,4),mean_Follow_60,CI_Follow_60)
+plt.show()
+
+# =============================================================================
+# analyzing response time =====================================================
+# =============================================================================
+RT_12_1_mean = np.nanmean(RT_12_1, axis=1)
+RT_12_4_mean = np.nanmean(RT_12_4, axis=1)
+RT_12_7_mean = np.nanmean(RT_12_7, axis=1)
+
+RT_60_1_mean = np.nanmean(RT_60_1, axis=1)
+RT_60_4_mean = np.nanmean(RT_60_4, axis=1)
+RT_60_7_mean = np.nanmean(RT_60_7, axis=1)
+
+RT_12_mean_all = np.empty((8,3))
+RT_12_mean_all[:,0] = RT_12_1_mean
+RT_12_mean_all[:,1] = RT_12_4_mean
+RT_12_mean_all[:,2] = RT_12_7_mean
+
+RT_60_mean_all = np.empty((8,3))
+RT_60_mean_all[:,0] = RT_60_1_mean
+RT_60_mean_all[:,1] = RT_60_4_mean
+RT_60_mean_all[:,2] = RT_60_7_mean
+
+mean_RT_12 = np.mean(RT_12_mean_all,axis=0)
+mean_RT_60 = np.mean(RT_60_mean_all,axis=0)
+
+CI_RT_12 = 1.96*np.std(RT_12_mean_all,axis=0)/math.sqrt(8)       # 95% confidence interval
+CI_RT_60 = 1.96*np.std(RT_60_mean_all,axis=0)/math.sqrt(8) 
+
+plt.xlim(0.5,3.5)
+plt.ylim(2.4,3.4)
+plt.xlabel('ratio of responding agents to the present agents')
+plt.ylabel('response time (s)')
+plt.xticks([1,2,3],['1/12','4/12','7/12'])
+plt.plot(np.arange(1,4),mean_RT_12,'-o', color='#005249')
+plt.plot(np.arange(1,4),mean_RT_60,'-o', color='#fb7d07')
+plt.errorbar(np.arange(1,4),mean_RT_12,CI_RT_12)
+plt.errorbar(np.arange(1,4),mean_RT_60,CI_RT_60)
+plt.show()
