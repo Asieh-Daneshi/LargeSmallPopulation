@@ -120,6 +120,9 @@ RLH_main = np.delete(RLH_main, OutlierIndices, axis = 0)
 Response_main = np.delete(Response_main, OutlierIndices, axis = 0)
 RT_main = np.delete(RT_main, OutlierIndices, axis = 0)
 DC_main = np.delete(DC_main, OutlierIndices, axis = 0)
+
+Number_of_outliers = sum(OutlierIndices)
+NP = NP-Number_of_outliers      # number of remaining participants after removind outliers
 # =============================================================================
 # We have two main factors: total number of agents (group size) that can be 12 
 # or 60, and number of responding agents that can be 1, 4, or 7 for the group size
@@ -201,12 +204,12 @@ all_12_7 = np.sum(~np.isnan(RLH_12_7), axis = 1)
 Follow_12_7_sum = np.sum(Follow_12_7)
 Following_12_7 = Follow_12_7_sum/all_12_7
 
-Follow_12 = np.empty((8,3))
+Follow_12 = np.empty((NP,3))
 Follow_12[:,0] = Following_12_1
 Follow_12[:,1] = Following_12_4
 Follow_12[:,2] = Following_12_7
 
-Follow_60 = np.empty((8,3))
+Follow_60 = np.empty((NP,3))
 Follow_60[:,0] = Following_60_1
 Follow_60[:,1] = Following_60_4
 Follow_60[:,2] = Following_60_7
@@ -214,8 +217,8 @@ Follow_60[:,2] = Following_60_7
 mean_Follow_12 = np.mean(Follow_12,axis=0)
 mean_Follow_60 = np.mean(Follow_60,axis=0)
 
-CI_Follow_12 = 1.96*np.std(Follow_12,axis=0)/math.sqrt(8)       # 95% confidence interval
-CI_Follow_60 = 1.96*np.std(Follow_60,axis=0)/math.sqrt(8) 
+CI_Follow_12 = 1.96*np.std(Follow_12,axis=0)/math.sqrt(NP)       # 95% confidence interval
+CI_Follow_60 = 1.96*np.std(Follow_60,axis=0)/math.sqrt(NP) 
 
 plt.xlim(0.5,3.5)
 plt.ylim(3.5,7)
@@ -242,12 +245,12 @@ RT_60_1_mean = np.nanmean(RT_60_1, axis=1)
 RT_60_4_mean = np.nanmean(RT_60_4, axis=1)
 RT_60_7_mean = np.nanmean(RT_60_7, axis=1)
 
-RT_12_mean_all = np.empty((8,3))
+RT_12_mean_all = np.empty((NP,3))
 RT_12_mean_all[:,0] = RT_12_1_mean
 RT_12_mean_all[:,1] = RT_12_4_mean
 RT_12_mean_all[:,2] = RT_12_7_mean
 
-RT_60_mean_all = np.empty((8,3))
+RT_60_mean_all = np.empty((NP,3))
 RT_60_mean_all[:,0] = RT_60_1_mean
 RT_60_mean_all[:,1] = RT_60_4_mean
 RT_60_mean_all[:,2] = RT_60_7_mean
@@ -255,8 +258,8 @@ RT_60_mean_all[:,2] = RT_60_7_mean
 mean_RT_12 = np.mean(RT_12_mean_all,axis=0)
 mean_RT_60 = np.mean(RT_60_mean_all,axis=0)
 
-CI_RT_12 = 1.96*np.std(RT_12_mean_all,axis=0)/math.sqrt(8)       # 95% confidence interval
-CI_RT_60 = 1.96*np.std(RT_60_mean_all,axis=0)/math.sqrt(8) 
+CI_RT_12 = 1.96*np.std(RT_12_mean_all,axis=0)/math.sqrt(NP)       # 95% confidence interval
+CI_RT_60 = 1.96*np.std(RT_60_mean_all,axis=0)/math.sqrt(NP) 
 
 plt.xlim(0.5,3.5)
 plt.ylim(2.4,3.4)
@@ -277,10 +280,10 @@ from statsmodels.stats.anova import anova_lm
 # column shows the "ratio of responding agents to the whole". The third and fourth 
 # columns show respectively "Following percentage" and "Response time".
 # (each row shows the data for one participant)
-wholeData = np.empty((8*6,4))
-wholeData [0:8*3,0] = np.ones(8*3)
-wholeData [8*3:,0] = np.ones(8*3)*2
-wholeData [:,1] = np.tile(np.tile(np.arange(1,4),8),2)
+wholeData = np.empty((NP*6,4))
+wholeData [0:NP*3,0] = np.ones(NP*3)
+wholeData [NP*3:,0] = np.ones(NP*3)*2
+wholeData [:,1] = np.tile(np.tile(np.arange(1,4),NP),2)
 tempStackedFollowing12 = np.vstack((Following_12_1, Following_12_4, Following_12_7))
 tempStackedFollowing60 = np.vstack((Following_60_1, Following_60_4, Following_60_7))
 wholeData [:,2] = np.hstack((tempStackedFollowing12.T.ravel(),tempStackedFollowing60.T.ravel()))
