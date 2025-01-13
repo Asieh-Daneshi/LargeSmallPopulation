@@ -268,3 +268,31 @@ plt.plot(np.arange(1,4),mean_RT_60,'-o', color='#fb7d07')
 plt.errorbar(np.arange(1,4),mean_RT_12,CI_RT_12)
 plt.errorbar(np.arange(1,4),mean_RT_60,CI_RT_60)
 plt.show()
+
+# =============================================================================
+import statsmodels.api as sm 
+from statsmodels.formula.api import ols 
+from statsmodels.stats.anova import anova_lm
+# Here I make a dataframe that its first column shows the "group size", the second
+# column shows the "ratio of responding agents to the whole". The third and fourth 
+# columns show respectively "Following percentage" and "Response time".
+# (each row shows the data for one participant)
+wholeData = np.empty((8*6,4))
+wholeData [0:8*3,0] = np.ones(8*3)
+wholeData [8*3:,0] = np.ones(8*3)*2
+wholeData [:,1] = np.tile(np.tile(np.arange(1,4),8),2)
+tempStackedFollowing12 = np.vstack((Following_12_1, Following_12_4, Following_12_7))
+tempStackedFollowing60 = np.vstack((Following_60_1, Following_60_4, Following_60_7))
+wholeData [:,2] = np.hstack((tempStackedFollowing12.T.ravel(),tempStackedFollowing60.T.ravel()))
+
+tempStackedRT12 = np.vstack((RT_12_1_mean, RT_12_4_mean, RT_12_7_mean))
+tempStackedRT60 = np.vstack((RT_60_1_mean, RT_60_4_mean, RT_60_7_mean))
+wholeData [:,3] = np.hstack((tempStackedRT12.T.ravel(),tempStackedRT60.T.ravel()))
+column_names = ['Group_Size', 'Number_of_responding_agents', 'Following_percentage', 'Response_time']
+wholeData_df = pd.DataFrame(wholeData,columns=column_names)
+# DataFrame has columns: 'Group_Size', 'Number_of_responding_agents', 'Following_percentage', 'Response_time'
+# Fit the model
+model = ols('Following_percentage ~ C(Group_Size) + C(Number_of_responding_agents) + C(Group_Size):C(Number_of_responding_agents)', data=wholeData_df).fit()
+# two-way ANOVA
+anova_results = anova_lm(model, typ=2)  # Use type 2 or 3 sums of squares for unbalanced designs
+print(anova_results)
