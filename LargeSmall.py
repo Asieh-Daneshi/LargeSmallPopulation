@@ -273,6 +273,8 @@ plt.errorbar(np.arange(1,4),mean_RT_60,CI_RT_60)
 plt.show()
 
 # =============================================================================
+# ANOVA =======================================================================
+# =============================================================================
 import statsmodels.api as sm 
 from statsmodels.formula.api import ols 
 from statsmodels.stats.anova import anova_lm
@@ -281,8 +283,8 @@ from statsmodels.stats.anova import anova_lm
 # columns show respectively "Following percentage" and "Response time".
 # (each row shows the data for one participant)
 wholeData = np.empty((NP*6,4))
-wholeData [0:NP*3,0] = np.ones(NP*3)
-wholeData [NP*3:,0] = np.ones(NP*3)*2
+wholeData [0:NP*3,0] = np.ones(NP*3)*12
+wholeData [NP*3:,0] = np.ones(NP*3)*60
 wholeData [:,1] = np.tile(np.tile(np.arange(1,4),NP),2)
 tempStackedFollowing12 = np.vstack((Following_12_1, Following_12_4, Following_12_7))
 tempStackedFollowing60 = np.vstack((Following_60_1, Following_60_4, Following_60_7))
@@ -294,8 +296,12 @@ wholeData [:,3] = np.hstack((tempStackedRT12.T.ravel(),tempStackedRT60.T.ravel()
 column_names = ['Group_Size', 'Number_of_responding_agents', 'Following_percentage', 'Response_time']
 wholeData_df = pd.DataFrame(wholeData,columns=column_names)
 # DataFrame has columns: 'Group_Size', 'Number_of_responding_agents', 'Following_percentage', 'Response_time'
-# Fit the model
-model = ols('Following_percentage ~ C(Group_Size) + C(Number_of_responding_agents) + C(Group_Size):C(Number_of_responding_agents)', data=wholeData_df).fit()
-# two-way ANOVA
-anova_results = anova_lm(model, typ=2)  # Use type 2 or 3 sums of squares for unbalanced designs
-print(anova_results)
+# 2-way ANOVA for the following percentage ====================================
+model_FollowingPercentage = ols('Following_percentage ~ C(Group_Size) + C(Number_of_responding_agents) + C(Group_Size):C(Number_of_responding_agents)', data=wholeData_df).fit()
+anova_results_FollowingPercentage = anova_lm(model_FollowingPercentage, typ=2)  # Use type 2 or 3 sums of squares for unbalanced designs
+print(anova_results_FollowingPercentage)
+# 2-way ANOVA for the Response time ===========================================
+model_RT = ols('Response_time ~ C(Group_Size) + C(Number_of_responding_agents) + C(Group_Size):C(Number_of_responding_agents)', data=wholeData_df).fit()
+anova_results_RT = anova_lm(model_RT, typ=2)  # Use type 2 or 3 sums of squares for unbalanced designs
+print(anova_results_RT)
+# P.S: Python is smart enough to understand numbers in first two columns are indices!
